@@ -1,0 +1,7 @@
+.build/
+.build-release/
+.docc-build/
+.swiftpm/
+Examples/*/.build/
+Examples/*/.swiftpm/
+.DS_Store

@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+      - run: swift --version
+      - name: Build
+        run: swift build
+      - name: Test
+        run: swift test --skip NotchDockHoverTests
+      - name: Hover walks (timing-sensitive, on their own)
+        run: swift test --filter NotchDockHoverTests
+      - name: Trust override is compiled out of Release
+        run: swift test -c release -Xswiftc -enable-testing --scratch-path .build-release --filter Trust
+      - name: Build the example app
+        run: swift build --package-path Examples/NotchDemo
+      - name: Build the documentation
+        shell: bash
+        run: |
+          xcodebuild docbuild -scheme PolytopicNotch -destination 'platform=macOS' -derivedDataPath .docc-build \
+            OTHER_DOCC_FLAGS="--warnings-as-errors" | tail -5
