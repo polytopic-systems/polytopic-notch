@@ -53,9 +53,12 @@ struct NotchTabBarTests {
         try await Task.sleep(for: .milliseconds(300))
 
         // Three equal tabs across 300 pt (10 pt in from the window's left): their centres.
-        let tabWidth = (300 - 2 * 2 - 2 * 2) / 3.0
+        let barWidth: Double = 300 - 2 * 2 - 2 * 2
+        let tabWidth = barWidth / 3
         func centre(_ tab: Tab) -> NSPoint {
-            NSPoint(x: 10 + 2 + (tabWidth + 2) * Double(Tab.allCases.firstIndex(of: tab)!) + tabWidth / 2, y: 22)
+            let index = Double(Tab.allCases.firstIndex(of: tab)!)
+            let left: Double = 10 + 2
+            return NSPoint(x: left + (tabWidth + 2) * index + tabWidth / 2, y: 22)
         }
         try await click(window, at: centre(.dns))
         #expect(model.tab == .dns)

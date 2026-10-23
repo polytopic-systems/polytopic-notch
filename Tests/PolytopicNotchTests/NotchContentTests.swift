@@ -188,6 +188,7 @@ struct NotchContentTests {
         let small = model.size(for: .showing).height
         settings.notch.fontSize = 22
         #expect(model.size(for: .showing).height > small)
-        #expect(model.bodyTextWidth == CGFloat(500 - 2 * 18 - 2 * 6))
+        let bodyTextWidth: CGFloat = 500 - 2 * 18 - 2 * 6
+        #expect(model.bodyTextWidth == bodyTextWidth)
     }
 }
