@@ -353,6 +353,28 @@ final class AppPreferences: NotchSettingsStore {
 - Store the enums' raw values (`grow`, `clearMenuBar`, `automatic`…); they never change.
 - `NotchPreview` draws a miniature screen around a sample of your body, for a Settings page.
 
+## The notch light colour
+
+```swift
+struct NotchLightSection: View {
+    let settings: any NotchSettingsStore
+
+    var body: some View {
+        Section("Notch light") {
+            NotchLightPicker(settings: settings, title: "MY APP / NOTCH LIGHT")
+                .listRowInsets(EdgeInsets())                    // the panel is its own black instrument
+        }
+    }
+}
+```
+
+- The user's colour (`NotchSettings.lightColor`) lights everything the pill draws: the status dot in every state, the
+  quiet line, the busy bars, attention and the meter; off is the colour at 35%. `nil` keeps your `NotchTheme`.
+- Store `lightColor` and `lightMemory` in your `notch` bridge as "#RRGGBB" strings (`NotchRGB(hex:)`, `.hex`), or the
+  choice won't stick.
+- The bar, the spectrum rail and the LEDs are drawn with Metal (`NotchLight.metal`, a copied resource compiled at first
+  use, so no Metal toolchain is needed to build); nothing animates unless the user turns BREATHE on.
+
 ## Tests with in-memory fakes
 
 ```swift

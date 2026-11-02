@@ -101,10 +101,17 @@ struct NotchStatusDot: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        let content = model.content
-        let dot = content.dot ?? NotchDot(color: themeColor, pulsing: content.status == .showing || content.status == .attention)
+        let dot = dot
         NotchPulsingDot(color: NSColor(dot.color), pulsing: dot.pulsing)
             .frame(width: 8, height: 8)
+    }
+
+    private var dot: NotchDot {
+        let content = model.content
+        var dot = content.dot ?? NotchDot(color: themeColor, pulsing: content.status == .showing || content.status == .attention)
+        // The user's light colour wins over the app's own dot colour too.
+        if content.dot != nil, let light = model.settings.notch.lightColor { dot.color = light.color }
+        return dot
     }
 
     private var themeColor: Color {
@@ -126,7 +133,8 @@ struct NotchQuietLine: View {
     var body: some View {
         let content = model.content
         // The line sits on the black notch: the dark-background shade.
-        let color = content.lineColor ?? (model.needsAttention ? model.theme.attention : model.theme.accentText(.dark))
+        let light = model.settings.notch.lightColor?.color
+        let color = light ?? content.lineColor ?? (model.needsAttention ? model.theme.attention : model.theme.accentText(.dark))
         let level = CGFloat(model.level)
         if content.busy {
             NotchLoadingSweep(color: model.theme.busy, height: 6)
@@ -151,7 +159,7 @@ struct NotchMeter: View {
         if model.content.busy {
             NotchLoadingBars(color: model.theme.busy, maxHeight: 14)
         } else {
-            NotchLevelBars(level: model.level, color: color)
+            NotchLevelBars(level: model.level, color: model.theme.meter ?? color)
         }
     }
 }

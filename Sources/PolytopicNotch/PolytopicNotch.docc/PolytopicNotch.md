@@ -72,6 +72,8 @@ Start with <doc:GettingStarted>, then <doc:Recipes>.
 - ``NotchNeighborRows``
 - ``NotchOwnLookRows``
 - ``NotchPreview``
+- ``NotchLightPicker``
+- ``NotchRGB``
 
 ### Other notch apps and menu bar managers
 

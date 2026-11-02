@@ -90,7 +90,14 @@ public struct NotchTextStyle: Equatable, Sendable {
 public final class NotchViewModel {
     public let content: NotchContent
     public let settings: any NotchSettingsStore
-    public var theme: NotchTheme
+    /// The theme the app gave, before the user's light colour.
+    public var appTheme: NotchTheme
+    /// What the pill draws with: the app's theme lit by the user's `NotchSettings.lightColor` (`NotchTheme.lit(by:)`).
+    /// Setting it sets `appTheme`.
+    public var theme: NotchTheme {
+        get { appTheme.lit(by: settings.notch.lightColor) }
+        set { appTheme = newValue }
+    }
     public let metrics: NotchMetrics
     public var geometry: NotchGeometry
     /// This app's share of the notch: `solo` without a dock, otherwise what the dock's layout gave this app.
@@ -123,7 +130,7 @@ public final class NotchViewModel {
         self.content = content
         self.settings = settings
         self.geometry = geometry
-        self.theme = theme
+        self.appTheme = theme
         self.metrics = metrics
     }
 

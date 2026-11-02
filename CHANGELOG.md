@@ -3,7 +3,26 @@
 PolytopicNotch follows [semantic versioning](https://semver.org): a major release may break the API or the dock
 protocol; minor and patch releases don't. Apps on different dock protocol majors don't dock together.
 
-## 1.1.0 (unreleased)
+## 1.2.0
+
+The notch light colour. Adds API; nothing changes for apps that don't use it.
+
+- **`NotchLightPicker`**: lets the user pick any colour for the notch light. A black instrument panel: the light as a
+  glowing bar, a spectrum rail with a notch for its marker (drag, or ←/→ with Shift for 10°), 16-LED rows for
+  intensity and white mix, a hex field, four memory keys with STORE, how each state will look, a readout, and
+  APP COLOUR to go back to the app's colours. BREATHE moves the bar like the quiet line moves with the level.
+- **Drawn with Metal**: the bar's bloom, the rail and the LEDs (`NotchLightMetal`, shaders in `NotchLight.metal`). The
+  `.metal` file is a copied resource compiled at first use (`makeLibrary(source:)`), so building the package still needs
+  no Metal toolchain; each view draws only when what it shows changes.
+  Where Metal isn't available the picker draws them with SwiftUI.
+- **`NotchSettings.lightColor`** (`NotchRGB?`, "#RRGGBB") and **`lightMemory`**: with a colour set, everything the
+  pill lights uses it: the status dot in every state, the quiet line, the busy bars and sweep, attention and the
+  meter (white until now); off is the colour at 35%. It wins over `NotchContent.dot` and `lineColor` too. Apps store
+  both in their `NotchSettingsStore` bridge.
+- **`NotchTheme.lit(by:)`** and **`NotchTheme.meter`**; `NotchViewModel.theme` is now the app's theme
+  (`appTheme`) lit by the user's colour. Setting `theme` sets `appTheme`, as before.
+
+## 1.1.0
 
 Panels in the pill. Adds API; nothing changes for apps that don't use it.
 

@@ -10,14 +10,14 @@ Swift package · macOS 26 or later · Swift 6 · no dependencies · by [Polytopi
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/polytopic-systems/polytopic-notch.git", from: "1.1.0"),
+    .package(url: "https://github.com/polytopic-systems/polytopic-notch.git", from: "1.2.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [.product(name: "PolytopicNotch", package: "polytopic-notch")]),
 ]
 ```
 
-In Xcode: File › Add Package Dependencies…, paste the URL, Up to Next Major Version from 1.1.0.
+In Xcode: File › Add Package Dependencies…, paste the URL, Up to Next Major Version from 1.2.0.
 
 ## Quick start
 
@@ -98,6 +98,7 @@ Copy-paste code, compiled by the package's tests, in
 | The block list | `NotchDock.setBlocked` |
 | A theme | `NotchTheme` |
 | Logging and diagnostics | `NotchLog`, `NotchDiagnostics` |
+| The notch light colour | `NotchLightPicker`, `NotchSettings.lightColor`, `NotchRGB` |
 | Settings rows | `NotchDisplayPicker`, `NotchSharingPicker`, `NotchOwnLookRows`, `NotchDockSettingsRows`, `NotchSettingsStore` |
 | Tests with in-memory fakes | `InMemoryNotchDockBus`, `NotchDockStaticTrust`, `InMemoryNotchDockSettingsStorage` |
 

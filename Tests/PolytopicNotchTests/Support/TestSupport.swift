@@ -1,4 +1,5 @@
 import AppKit
+import MetalKit
 import SwiftUI
 import Testing
 @testable import PolytopicNotch
@@ -64,6 +65,7 @@ enum OffscreenRender {
     /// waits for it to settle and captures it with `cacheDisplay`.
     @discardableResult
     static func window(_ name: String, size: NSSize, dark: Bool = false, settle: Duration = .milliseconds(700),
+                       compositeMetal: Bool = false,
                        @ViewBuilder content: () -> some View) async throws -> NSBitmapImageRep {
         // Really out of sight: transparent, off every screen, and out of the window cycle (at a screen corner
         // every render flashed by). `cacheDisplay` draws the views themselves, so neither changes the
@@ -86,8 +88,40 @@ enum OffscreenRender {
         let view = window.contentView!
         let rep = try #require(view.bitmapImageRepForCachingDisplay(in: view.bounds))
         view.cacheDisplay(in: view.bounds, to: rep)
+        if compositeMetal { drawMetalViews(in: view, onto: rep) }
         try write(rep, name: dark ? "\(name)-dark" : name)
         return rep
+    }
+
+    /// `cacheDisplay` leaves Metal layers empty: draw each light picker `MTKView`'s frame (rendered offscreen with the
+    /// same uniforms) into the capture where the view is.
+    static func drawMetalViews(in root: NSView, onto rep: NSBitmapImageRep) {
+        guard let metal = NotchLightMetal.shared else { return }
+        let scale = CGFloat(rep.pixelsWide) / root.bounds.width
+        NSGraphicsContext.saveGraphicsState()
+        defer { NSGraphicsContext.restoreGraphicsState() }
+        NSGraphicsContext.current = NSGraphicsContext(bitmapImageRep: rep)
+        func visit(_ view: NSView) {
+            if let mtk = view as? MTKView, let coordinator = mtk.delegate as? NotchLightMetalView.Coordinator {
+                let frame = view.convert(view.bounds, to: root)
+                let (w, h) = (Int(frame.width * scale), Int(frame.height * scale))
+                var uniforms = coordinator.uniforms
+                uniforms.scale = Float(scale)
+                guard w > 0, h > 0, var bytes = metal.pixels(uniforms, width: w, height: h) else { return }
+                let drawn = bytes.withUnsafeMutableBytes { raw -> CGImage? in
+                    guard let context = CGContext(data: raw.baseAddress, width: w, height: h, bitsPerComponent: 8, bytesPerRow: w * 4,
+                                                  space: CGColorSpace(name: CGColorSpace.sRGB)!,
+                                                  bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
+                    else { return nil }
+                    return context.makeImage()
+                }
+                // The capture's coordinates are flipped against the root view's when the root isn't flipped.
+                let y = root.isFlipped ? root.bounds.height - frame.maxY : frame.minY
+                if let drawn { NSImage(cgImage: drawn, size: frame.size).draw(in: NSRect(x: frame.minX, y: y, width: frame.width, height: frame.height)) }
+            }
+            view.subviews.forEach(visit)
+        }
+        visit(root)
     }
 
     static func write(_ rep: NSBitmapImageRep, name: String) throws {

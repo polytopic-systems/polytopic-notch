@@ -30,10 +30,16 @@ public struct NotchSettings: Equatable, Sendable {
     public var indicator: NotchIndicatorPosition = .besideNotch
     /// Text size of the app's own text in the pill (headline, captions); the preview reads it.
     public var fontSize: Double = 15
+    /// The notch light's colour (`NotchLightPicker`): every light the pill draws (dot, quiet line, busy bars, meter,
+    /// attention). `nil`: the app's theme colours.
+    public var lightColor: NotchRGB?
+    /// The picker's memory slots.
+    public var lightMemory: [NotchRGB] = NotchRGB.defaultMemory
 
     public init(isShown: Bool = true, display: NotchDisplay = .builtIn, sharing: NotchSharing = .automatic,
                 ignoredApps: [NotchIgnoredApp] = [], pillShape: NotchPillShape = .grow,
-                indicator: NotchIndicatorPosition = .besideNotch, fontSize: Double = 15) {
+                indicator: NotchIndicatorPosition = .besideNotch, fontSize: Double = 15,
+                lightColor: NotchRGB? = nil, lightMemory: [NotchRGB] = NotchRGB.defaultMemory) {
         self.isShown = isShown
         self.display = display
         self.sharing = sharing
@@ -41,6 +47,8 @@ public struct NotchSettings: Equatable, Sendable {
         self.pillShape = pillShape
         self.indicator = indicator
         self.fontSize = fontSize
+        self.lightColor = lightColor
+        self.lightMemory = lightMemory
     }
 }
 

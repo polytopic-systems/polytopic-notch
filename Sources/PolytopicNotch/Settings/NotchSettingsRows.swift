@@ -218,6 +218,7 @@ public struct NotchPreview<Content: View>: View {
     public var body: some View {
         let notch = settings.notch
         let clear = notch.pillShape == .clearMenuBar
+        let theme = theme.lit(by: notch.lightColor)
         ZStack(alignment: .top) {
             LinearGradient(colors: theme.previewBackdrop(), startPoint: .topLeading, endPoint: .bottomTrailing)
             // Menu bar strip.
@@ -228,9 +229,9 @@ public struct NotchPreview<Content: View>: View {
                     Color.clear.frame(height: 16 + NotchOutline.shoulder)
                 } else {
                     HStack {
-                        NotchLevelBars(level: 0.6, color: .white, barCount: 4, maxHeight: 9)
+                        NotchLevelBars(level: 0.6, color: theme.meter ?? .white, barCount: 4, maxHeight: 9)
                         Spacer()
-                        Circle().fill(dotColor ?? theme.accentText(.dark)).frame(width: 6, height: 6)
+                        Circle().fill(notch.lightColor?.color ?? dotColor ?? theme.accentText(.dark)).frame(width: 6, height: 6)
                     }
                     .frame(height: 16)
                     .padding(.horizontal, 14)

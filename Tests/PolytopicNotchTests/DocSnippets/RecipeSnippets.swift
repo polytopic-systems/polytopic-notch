@@ -278,6 +278,17 @@ struct NotchSettingsPage: View {
     }
 }
 
+struct NotchLightSection: View {
+    let settings: any NotchSettingsStore
+
+    var body: some View {
+        Section("Notch light") {
+            NotchLightPicker(settings: settings, title: "MY APP / NOTCH LIGHT")
+                .listRowInsets(EdgeInsets())                    // the panel is its own black instrument
+        }
+    }
+}
+
 @MainActor
 @Observable
 final class AppPreferences: NotchSettingsStore {

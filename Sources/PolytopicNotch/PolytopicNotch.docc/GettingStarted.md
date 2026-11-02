@@ -7,14 +7,14 @@ Add the package and show a first pill at the notch.
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/polytopic-systems/polytopic-notch.git", from: "1.1.0"),
+    .package(url: "https://github.com/polytopic-systems/polytopic-notch.git", from: "1.2.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [.product(name: "PolytopicNotch", package: "polytopic-notch")]),
 ]
 ```
 
-In Xcode: File › Add Package Dependencies…, paste the URL, Up to Next Major Version from 1.1.0.
+In Xcode: File › Add Package Dependencies…, paste the URL, Up to Next Major Version from 1.2.0.
 
 macOS 26 or later, Swift 6, no dependencies, no Accessibility or Screen Recording permission.
 

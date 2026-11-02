@@ -22,12 +22,25 @@ struct NotchDemoApp: App {
             Button(demo.isLive ? "Stop the Live Session" : "Start a Live Session") { demo.toggleLive() }
             Button("Ask a Question") { demo.ask() }
             Divider()
-            SettingsLink { Text("Settings…") }
+            SettingsButton()
             Button("Quit") { NSApp.terminate(nil) }
         }
         Settings {
             DemoSettings(demo: demo)
         }
+    }
+}
+
+/// Opens Settings in front. A menu bar app isn't active, so `SettingsLink` alone opens the window behind the others.
+struct SettingsButton: View {
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        Button("Settings…") {
+            NSApp.activate()
+            openSettings()
+        }
+        .keyboardShortcut(",")
     }
 }
 
@@ -292,11 +305,15 @@ struct DemoSettings: View {
                 NotchSharingPicker(settings: demo.settings)
                 NotchOwnLookRows(settings: demo.settings, monitor: demo.neighbors)
             }
+            Section("Light") {
+                NotchLightPicker(settings: demo.settings, theme: .standard, title: "NOTCH DEMO / NOTCH LIGHT")
+                    .listRowInsets(EdgeInsets())
+            }
             Section("Sharing the notch with other apps") {
                 NotchDockSettingsRows(dock: demo.dock)
             }
         }
         .formStyle(.grouped)
-        .frame(width: 520, height: 560)
+        .frame(width: 560, height: 760)
     }
 }

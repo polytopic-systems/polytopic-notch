@@ -17,6 +17,8 @@ public struct NotchTheme: Sendable {
     public var quiet: Color
     /// The dot while off.
     public var off: Color
+    /// The meter's bars. `nil`: white on the black pill (`.primary` in the light menu bar band), as always.
+    public var meter: Color?
     /// The Settings preview's miniature desktop.
     public var previewBackdrop: @MainActor @Sendable () -> [Color]
     /// The title in the band on screens without a notch.
@@ -25,7 +27,7 @@ public struct NotchTheme: Sendable {
     public init(accent: @escaping @MainActor @Sendable () -> Color = { .accentColor },
                 accentText: @escaping @MainActor @Sendable (ColorScheme) -> Color = { _ in .accentColor },
                 attention: Color = .orange, busy: Color = .orange, quiet: Color = .green, off: Color = .gray,
-                previewBackdrop: (@MainActor @Sendable () -> [Color])? = nil,
+                meter: Color? = nil, previewBackdrop: (@MainActor @Sendable () -> [Color])? = nil,
                 bandTitleFont: Font = .system(size: 12, weight: .semibold)) {
         self.accent = accent
         self.accentText = accentText
@@ -33,6 +35,7 @@ public struct NotchTheme: Sendable {
         self.busy = busy
         self.quiet = quiet
         self.off = off
+        self.meter = meter
         self.previewBackdrop = previewBackdrop ?? { [accent().opacity(0.45), accent().opacity(0.15), .gray.opacity(0.25)] }
         self.bandTitleFont = bandTitleFont
     }

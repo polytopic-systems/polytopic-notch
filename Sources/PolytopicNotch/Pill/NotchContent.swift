@@ -91,9 +91,11 @@ public final class NotchContent {
     /// Working on something the user waits for (a model loading): the meter becomes loading bars and the quiet
     /// line a moving band, a little bigger so it's easy to spot.
     public var busy = false
-    /// The dot's colour and pulse; `nil`: the theme's colour for the status, pulsing while showing.
+    /// The dot's colour and pulse; `nil`: the theme's colour for the status, pulsing while showing. The user's
+    /// `NotchSettings.lightColor`, when set, replaces the colour.
     public var dot: NotchDot?
-    /// The quiet line's colour; `nil`: the theme's accent (attention colour while `.attention`).
+    /// The quiet line's colour; `nil`: the theme's accent (attention colour while `.attention`). The user's
+    /// `NotchSettings.lightColor`, when set, wins.
     public var lineColor: Color?
 
     /// Below the band while showing (captions, a headline, an offer). `nil`: just the band.
