@@ -10,7 +10,7 @@ Swift package · macOS 26 or later · Swift 6 · no dependencies · by [Polytopi
 ```swift
 // Package.swift
 dependencies: [
-    .package(url: "https://github.com/polytopic-systems/polytopic-notch.git", from: "1.2.0"),
+    .package(url: "https://github.com/polytopic-systems/polytopic-notch.git", from: "1.3.0"),
 ],
 targets: [
     .target(name: "MyApp", dependencies: [.product(name: "PolytopicNotch", package: "polytopic-notch")]),
@@ -112,6 +112,9 @@ Copy-paste code, compiled by the package's tests, in
 - **The dock**: apps using this package share the notch in the style the user picks (Priority, Switcher, Split,
   Merged), whoever made them.
 - **Nothing ticks while idle**: no per-frame timers, no polling while nothing shows.
+- **Speaks the user's language**: its own words (Settings rows, the notch light panel, accessibility labels) come in
+  English, German, Japanese, Vietnamese, French, Spanish, Italian and Polish, following the app's language. Text your
+  app passes in is yours to translate ([Localization](Docs/Localization.md)).
 
 ## The example app
 

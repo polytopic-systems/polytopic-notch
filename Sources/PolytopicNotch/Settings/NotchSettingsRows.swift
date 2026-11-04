@@ -25,9 +25,9 @@ public struct NotchDisplayPicker: View {
     }
 
     public var body: some View {
-        Picker("Display", selection: settings.binding(\.display)) {
-            Text("Built-in display").tag(NotchDisplay.builtIn)
-            Text("Display I'm working on").tag(NotchDisplay.active)
+        Picker(String(localized: "Display", bundle: .module, comment: "Settings picker: which display the pill is on"), selection: settings.binding(\.display)) {
+            Text("Built-in display", bundle: .module).tag(NotchDisplay.builtIn)
+            Text("Display I'm working on", bundle: .module, comment: "The display the user is working on now").tag(NotchDisplay.active)
         }
     }
 }
@@ -37,20 +37,25 @@ public struct NotchSharingPicker: View {
     var settings: any NotchSettingsStore
     var caption: String
 
+    /// The default caption, in the app's language.
+    @usableFromInline static var defaultCaption: String {
+        String(localized: "When another app is using the notch, like Boring Notch, Atoll or Bartender's Top Shelf, the pill hangs just below it. It also steps under a menu bar manager's bar of hidden items while that is open. Hold Option on the notch to leave it to the other app.",
+               bundle: .module)
+    }
+
     /// The caption says what moves ("captions hang just below it", "the pill hangs just below it").
-    public init(settings: any NotchSettingsStore,
-                caption: String = "When another app is using the notch, like Boring Notch, Atoll or Bartender's Top Shelf, the pill hangs just below it. It also steps under a menu bar manager's bar of hidden items while that is open. Hold Option on the notch to leave it to the other app.") {
+    public init(settings: any NotchSettingsStore, caption: String = NotchSharingPicker.defaultCaption) {
         self.settings = settings
         self.caption = caption
     }
 
     public var body: some View {
         Picker(selection: settings.binding(\.sharing)) {
-            Text("Automatically").tag(NotchSharing.automatic)
-            Text("Always").tag(NotchSharing.always)
-            Text("Never").tag(NotchSharing.never)
+            Text("Automatically", bundle: .module, comment: "Make room for other notch apps: automatically").tag(NotchSharing.automatic)
+            Text("Always", bundle: .module, comment: "Make room for other notch apps: always").tag(NotchSharing.always)
+            Text("Never", bundle: .module, comment: "Make room for other notch apps: never").tag(NotchSharing.never)
         } label: {
-            Text("Make room for other notch apps")
+            Text("Make room for other notch apps", bundle: .module, comment: "Settings picker title")
             notchSettingsCaption(caption)
         }
     }
@@ -90,7 +95,7 @@ public struct NotchNeighborRows: View {
     public var body: some View {
         let rows = Self.rows(detected: monitor.detected, ignored: settings.notch.ignoredApps)
         if rows.isEmpty {
-            Text("No other app is using the notch right now.")
+            Text("No other app is using the notch right now.", bundle: .module)
                 .font(.callout).foregroundStyle(.secondary)
         }
         ForEach(rows) { row in
@@ -102,23 +107,28 @@ public struct NotchNeighborRows: View {
                     Text(Self.subtitle(row)).font(.caption).foregroundStyle(.secondary).lineLimit(1)
                 }
                 Spacer(minLength: 8)
-                Toggle("Make room", isOn: Binding(get: { makingRoom }, set: { setMakingRoom($0, for: row) }))
+                Toggle(String(localized: "Make room", bundle: .module, comment: "Switch (label hidden): make room in the notch for this other app"), isOn: Binding(get: { makingRoom }, set: { setMakingRoom($0, for: row) }))
                     .labelsHidden()
                     .toggleStyle(.switch)
-                    .help(makingRoom ? "Turn off if \(row.name) isn't really using the notch" : "Make room for \(row.name) again")
+                    .help(makingRoom ? String(localized: "Turn off if \(row.name) isn't really using the notch", bundle: .module, comment: "Tooltip; the name is another app")
+                                      : String(localized: "Make room for \(row.name) again", bundle: .module, comment: "Tooltip; the name is another app"))
             }
         }
     }
 
     private func title(_ row: Row, makingRoom: Bool) -> String {
-        guard makingRoom else { return "Not making room for \(row.name)" }
-        return settings.notch.sharing == .never ? "\(row.name) is using the notch too" : "Sharing the notch with \(row.name)"
+        guard makingRoom else { return String(localized: "Not making room for \(row.name)", bundle: .module, comment: "The name is another app that uses the notch") }
+        return settings.notch.sharing == .never
+            ? String(localized: "\(row.name) is using the notch too", bundle: .module, comment: "The name is another app that uses the notch")
+            : String(localized: "Sharing the notch with \(row.name)", bundle: .module, comment: "The name is another app that uses the notch")
     }
 
     static func subtitle(_ row: Row) -> String {
-        guard row.running else { return "Not running" }
-        if row.profileName == "Bartender" { return "Top Shelf is on" }
-        return row.profileName != nil ? "Known notch app" : "Found by its window over the notch"
+        guard row.running else { return String(localized: "Not running", bundle: .module, comment: "Status of an app in a list: it isn't open") }
+        if row.profileName == "Bartender" { return String(localized: "Top Shelf is on", bundle: .module, comment: "Top Shelf is a Bartender feature; keep its name") }
+        return row.profileName != nil
+            ? String(localized: "Known notch app", bundle: .module, comment: "Another app this package knows uses the notch")
+            : String(localized: "Found by its window over the notch", bundle: .module, comment: "How another notch app was detected")
     }
 
     private func isIgnored(_ bundleID: String) -> Bool {
@@ -136,12 +146,13 @@ public struct NotchNeighborRows: View {
 
 /// The wording of `NotchOwnLookRows`, so an app can say "Caption shape" and "Listening indicator".
 public struct NotchOwnLookText: Sendable {
-    public var shapeTitle = "Shape"
-    public var shapeSharedCaption = "Not used while the notch is shared: the pill already hangs below it."
-    public var shapeCaption = "Keeping the menu bar clear leaves menus and icons beside the notch uncovered."
-    public var indicatorTitle = "Quiet indicator"
-    public var indicatorSharedCaption = "Not used while the notch is shared: a slim line under the notch shows it's active."
-    public var indicatorCaption = "While there's nothing to show: a dot and meter beside the notch, or a slim line under it."
+    public var shapeTitle = String(localized: "Shape", bundle: .module, comment: "Settings picker title: the pill's shape")
+    public var shapeSharedCaption = String(localized: "Not used while the notch is shared: the pill already hangs below it.", bundle: .module)
+    public var shapeCaption = String(localized: "Keeping the menu bar clear leaves menus and icons beside the notch uncovered.", bundle: .module)
+    public var indicatorTitle = String(localized: "Quiet indicator", bundle: .module,
+                                       comment: "Settings picker title: what the pill shows while there's nothing to show")
+    public var indicatorSharedCaption = String(localized: "Not used while the notch is shared: a slim line under the notch shows it's active.", bundle: .module)
+    public var indicatorCaption = String(localized: "While there's nothing to show: a dot and meter beside the notch, or a slim line under it.", bundle: .module)
 
     public init() {}
 
@@ -171,15 +182,15 @@ public struct NotchOwnLookRows: View {
         let sharing = sharing
         Group {
             Picker(selection: settings.binding(\.pillShape)) {
-                Text("Grow from the notch").tag(NotchPillShape.grow)
-                Text("Keep the menu bar clear").tag(NotchPillShape.clearMenuBar)
+                Text("Grow from the notch", bundle: .module, comment: "Pill shape option").tag(NotchPillShape.grow)
+                Text("Keep the menu bar clear", bundle: .module, comment: "Pill shape option").tag(NotchPillShape.clearMenuBar)
             } label: {
                 Text(text.shapeTitle)
                 notchSettingsCaption(sharing ? text.shapeSharedCaption : text.shapeCaption)
             }
             Picker(selection: settings.binding(\.indicator)) {
-                Text("Beside the notch").tag(NotchIndicatorPosition.besideNotch)
-                Text("Under the notch").tag(NotchIndicatorPosition.underNotch)
+                Text("Beside the notch", bundle: .module, comment: "Quiet indicator position option").tag(NotchIndicatorPosition.besideNotch)
+                Text("Under the notch", bundle: .module, comment: "Quiet indicator position option").tag(NotchIndicatorPosition.underNotch)
             } label: {
                 Text(text.indicatorTitle)
                 notchSettingsCaption(sharing ? text.indicatorSharedCaption : text.indicatorCaption)

@@ -3,6 +3,20 @@
 PolytopicNotch follows [semantic versioning](https://semver.org): a major release may break the API or the dock
 protocol; minor and patch releases don't. Apps on different dock protocol majors don't dock together.
 
+## 1.3.0
+
+Localized. Nothing changes in English, and no API changes.
+
+- **Localized into German, Japanese, Vietnamese, French, Spanish, Italian and Polish; the pill follows the app's
+  language.** The package's own words come from its String Catalog (`Resources/Localizable.xcstrings`, shipped in the
+  library): the Settings rows, the dock's styles and app list, the notch light panel, the live list's "new" capsule
+  and the accessibility labels. An app that is localized into one of these languages gets them with no code; text
+  the app passes in (titles, captions, its own `NotchOwnLookText` wording or picker title) is still the app's to
+  translate.
+- `NotchDockStylePicker.defaultCaption` is now computed, in the app's language.
+- `Docs/Localization.md` and `Tools/l10n/`: how strings are written, and the tools that extract, translate and check
+  them.
+
 ## 1.2.0
 
 The notch light colour. Adds API; nothing changes for apps that don't use it.

@@ -132,7 +132,7 @@ struct NotchLiveNewCapsule: View {
         Button(action: action) {
             HStack(spacing: 4) {
                 Image(systemName: edge == .top ? "arrow.up" : "arrow.down")
-                Text("\(count) new")
+                Text("\(count) new", bundle: .module, comment: "Capsule over a live list: how many new rows arrived")
             }
             .font(.system(size: 11, weight: .semibold))
             .foregroundStyle(Self.readableText(on: fill))
@@ -144,7 +144,7 @@ struct NotchLiveNewCapsule: View {
         }
         .buttonStyle(.plain)
         .padding(6)
-        .accessibilityLabel("\(count) new, show the latest")
+        .accessibilityLabel(String(localized: "\(count) new, show the latest", bundle: .module, comment: "Button over a live list: new rows arrived; clicking it scrolls to them"))
     }
 
     /// Near-black or white, whichever contrasts more with the fill (WCAG relative luminance).

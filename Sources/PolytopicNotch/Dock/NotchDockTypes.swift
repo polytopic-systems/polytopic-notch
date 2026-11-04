@@ -24,23 +24,24 @@ public enum NotchSharingStyle: String, Sendable, CaseIterable, Codable {
         self.init(stored: try? decoder.singleValueContainer().decode(String.self))
     }
 
-    /// The Settings picker's name.
+    /// The Settings picker's name, in the app's language.
     public var title: String {
         switch self {
-        case .priority: "Priority"
-        case .switcher: "Switcher"
-        case .split: "Split"
-        case .merged: "Merged"
+        case .priority: String(localized: "Priority", bundle: .module, comment: "Name of a notch sharing style: one app at a time")
+        case .switcher: String(localized: "Switcher", bundle: .module, comment: "Name of a notch sharing style: one app at a time, dots to switch")
+        case .split: String(localized: "Split", bundle: .module, comment: "Name of a notch sharing style: side by side")
+        case .merged: String(localized: "Merged", bundle: .module, comment: "Name of a notch sharing style: stacked in one pill")
         }
     }
 
-    /// One plain line for the Settings picker.
+    /// One plain line for the Settings picker, in the app's language.
     public var explanation: String {
         switch self {
-        case .priority: "The app with the most to show gets the notch; the others wait."
-        case .switcher: "Like Priority, with a dot for each app when you hover; click one to switch."
-        case .split: "Each app keeps a corner of the notch, and what they show sits side by side."
-        case .merged: "One pill, with each app's part stacked below the one before."
+        case .priority: String(localized: "The app with the most to show gets the notch; the others wait.", bundle: .module)
+        case .switcher: String(localized: "Like Priority, with a dot for each app when you hover; click one to switch.", bundle: .module,
+                               comment: "Priority is a sharing style name")
+        case .split: String(localized: "Each app keeps a corner of the notch, and what they show sits side by side.", bundle: .module)
+        case .merged: String(localized: "One pill, with each app's part stacked below the one before.", bundle: .module)
         }
     }
 }

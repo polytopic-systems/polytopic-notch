@@ -27,10 +27,15 @@ public struct NotchLightPicker: View {
 
     /// `theme` is the app's, for "APP COLOUR" (no light colour chosen) and the states it draws then. `title` heads the
     /// panel, e.g. "TATTLE / NOTCH LIGHT".
-    public init(settings: any NotchSettingsStore, theme: NotchTheme = .standard, title: String = "NOTCH LIGHT") {
+    public init(settings: any NotchSettingsStore, theme: NotchTheme = .standard, title: String = NotchLightPicker.defaultTitle) {
         self.settings = settings
         self.theme = theme
         self.title = title
+    }
+
+    /// The default title, in the app's language.
+    @usableFromInline static var defaultTitle: String {
+        String(localized: "NOTCH LIGHT", bundle: .module, comment: "Title of the notch light colour panel; keep it uppercase")
     }
 
     /// What the notch shows now: the chosen colour, or the app's own.
@@ -41,7 +46,7 @@ public struct NotchLightPicker: View {
     public var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            Text(hexError ? "Enter six hex digits, like #00C8FF" : " ")
+            Text(hexError ? String(localized: "Enter six hex digits, like #00C8FF", bundle: .module, comment: "Error under a hex colour field") : " ")
                 .font(Self.mono(11))
                 .foregroundStyle(Color(red: 1, green: 0.41, blue: 0.38))
                 .frame(maxWidth: .infinity, alignment: .trailing)
@@ -77,9 +82,9 @@ public struct NotchLightPicker: View {
         HStack(spacing: 10) {
             Self.label(title)
             Spacer()
-            Self.key("BREATHE", on: breathing) { breathing.toggle() }
-                .accessibilityLabel("Breathe")
-                .accessibilityValue(breathing ? "On" : "Off")
+            Self.key(String(localized: "BREATHE", bundle: .module, comment: "Uppercase key on a black instrument panel; keep it uppercase and short. Makes the light pulse slowly"), on: breathing) { breathing.toggle() }
+                .accessibilityLabel(String(localized: "Breathe", bundle: .module, comment: "Accessibility: the key that makes the light pulse slowly"))
+                .accessibilityValue(breathing ? Self.on : Self.off)
             TextField("", text: $hexText)
                 .textFieldStyle(.plain)
                 .font(Self.mono(15))
@@ -90,7 +95,7 @@ public struct NotchLightPicker: View {
                 .padding(.bottom, 3)
                 .overlay(alignment: .bottom) { Rectangle().fill(Self.hairline).frame(height: 1) }
                 .focused($hexFocused)
-                .accessibilityLabel("Hex colour")
+                .accessibilityLabel(String(localized: "Hex colour", bundle: .module, comment: "Accessibility: the field for a #RRGGBB colour"))
                 .onChange(of: hexText) { _, text in
                     hexError = false
                     // Only typing chooses a colour; the control filling the field in doesn't.
@@ -149,8 +154,8 @@ public struct NotchLightPicker: View {
             return .handled
         }
         .accessibilityElement()
-        .accessibilityLabel("Hue")
-        .accessibilityValue("\(Int(hue.rounded())) degrees")
+        .accessibilityLabel(String(localized: "Hue", bundle: .module, comment: "Accessibility: the colour spectrum slider"))
+        .accessibilityValue(String(localized: "\(Int(hue.rounded())) degrees", bundle: .module, comment: "Accessibility: the hue's angle"))
         .accessibilityAdjustableAction { direction in
             setHue((hue + (direction == .increment ? 10 : -10) + 360).truncatingRemainder(dividingBy: 360))
         }
@@ -159,7 +164,7 @@ public struct NotchLightPicker: View {
     private var ledRows: some View {
         Grid(alignment: .leading, horizontalSpacing: 12, verticalSpacing: 14) {
             GridRow {
-                Self.label("INTENSITY").frame(width: 96, alignment: .leading)
+                Self.label(String(localized: "INTENSITY", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short")).frame(width: 96, alignment: .leading)
                 NotchLightLEDs(count: Self.steps, lit: intensity, metal: ledUniforms(.intensity, lit: intensity), color: { step in
                     NotchRGB(hue: hue, saturation: saturation, brightness: Self.brightness(step)).color
                 }, unlit: { step in
@@ -168,18 +173,18 @@ public struct NotchLightPicker: View {
                     intensity = max(1, lit)
                     commit()
                 }
-                .accessibilityLabel("Intensity")
+                .accessibilityLabel(String(localized: "Intensity", bundle: .module, comment: "Accessibility: the light's brightness"))
                 Self.readout(intensity)
             }
             GridRow {
-                Self.label("WHITE MIX").frame(width: 96, alignment: .leading)
+                Self.label(String(localized: "WHITE MIX", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short. How much white is mixed into the colour")).frame(width: 96, alignment: .leading)
                 NotchLightLEDs(count: Self.steps, lit: whiteMix, metal: ledUniforms(.whiteMix, lit: whiteMix), color: { step in
                     NotchRGB(hue: hue, saturation: 1 - Double(step) / Double(Self.steps), brightness: 1).color
                 }, unlit: { _ in .white.opacity(0.08) }) { lit in
                     whiteMix = lit
                     commit()
                 }
-                .accessibilityLabel("White mix")
+                .accessibilityLabel(String(localized: "White mix", bundle: .module, comment: "Accessibility: how much white is mixed into the colour"))
                 Self.readout(whiteMix)
             }
         }
@@ -189,14 +194,14 @@ public struct NotchLightPicker: View {
     private var memoryRow: some View {
         let memory = settings.notch.lightMemory
         return HStack(spacing: 6) {
-            Self.label("MEMORY").frame(width: 96, alignment: .leading)
+            Self.label(String(localized: "MEMORY", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short. Four stored colours")).frame(width: 96, alignment: .leading)
             ForEach(memory.indices, id: \.self) { index in
                 Button {
                     slot = index
                     choose(memory[index])
                     load(memory[index])
                 } label: {
-                    Text("\(index + 1)")
+                    Text(verbatim: "\(index + 1)")
                         .font(Self.mono(11))
                         .foregroundStyle(index == slot ? .white : Self.muted)
                         .frame(width: 34, height: 34)
@@ -209,16 +214,16 @@ public struct NotchLightPicker: View {
                         }
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel("Memory \(index + 1), \(memory[index].hex)")
+                .accessibilityLabel(String(localized: "Memory \(index + 1), \(memory[index].hex)", bundle: .module, comment: "Accessibility: a stored colour, its number and its hex code"))
             }
             Spacer()
-            Self.key("STORE", on: false) {
+            Self.key(String(localized: "STORE", bundle: .module, comment: "Uppercase key on a black instrument panel; keep it uppercase and short. Stores the colour in the selected memory"), on: false) {
                 var memory = settings.notch.lightMemory
                 guard memory.indices.contains(slot) else { return }
                 memory[slot] = shown
                 settings.notch.lightMemory = memory
             }
-            .accessibilityLabel("Store in memory \(slot + 1)")
+            .accessibilityLabel(String(localized: "Store in memory \(slot + 1)", bundle: .module, comment: "Accessibility: store the colour in memory number N"))
         }
         .padding(.vertical, 16)
     }
@@ -226,8 +231,10 @@ public struct NotchLightPicker: View {
     private var statesRow: some View {
         let lit = theme.lit(by: settings.notch.lightColor)
         let states: [(String, Color, CGFloat, Bool)] = [
-            ("SHOWING", lit.accentText(.dark), 0.6, true), ("QUIET", lit.quiet, 0.4, true),
-            ("ALERT", lit.attention, 0.72, true), ("OFF", lit.off, 0.28, false),
+            (String(localized: "SHOWING", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short. The pill's state while it shows something"), lit.accentText(.dark), 0.6, true),
+            (String(localized: "QUIET", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short. The pill's state while there's nothing to show"), lit.quiet, 0.4, true),
+            (String(localized: "ALERT", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short. The pill's state while it needs attention"), lit.attention, 0.72, true),
+            (String(localized: "OFF", bundle: .module, comment: "Uppercase row label on a black instrument panel; keep it uppercase and short. The pill's state while it's off"), lit.off, 0.28, false),
         ]
         return HStack(spacing: 12) {
             ForEach(states, id: \.0) { name, color, width, glows in
@@ -259,19 +266,21 @@ public struct NotchLightPicker: View {
         let rgb = shown
         let following = settings.notch.lightColor == nil
         return HStack {
-            Text("HUE \(Self.three(hue))  ·  INT \(Self.three(Double(intensity) / Double(Self.steps) * 100))  ·  MIX \(Self.three(Double(whiteMix) / Double(Self.steps) * 100))  ·  RGB \(rgb.red) \(rgb.green) \(rgb.blue)")
+            Text(String(localized: "HUE \(Self.three(hue))  ·  INT \(Self.three(Double(intensity) / Double(Self.steps) * 100))  ·  MIX \(Self.three(Double(whiteMix) / Double(Self.steps) * 100))  ·  RGB \(rgb.red) \(rgb.green) \(rgb.blue)",
+                        bundle: .module,
+                        comment: "Uppercase readout on an instrument panel: hue, intensity, white mix, RGB. Keep it uppercase, short and abbreviated; keep the two spaces around each ·"))
                 .font(Self.mono(11))
                 .tracking(2)
                 .foregroundStyle(Self.dim)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
             Spacer(minLength: 8)
-            Self.key("APP COLOUR", on: following) {
+            Self.key(String(localized: "APP COLOUR", bundle: .module, comment: "Uppercase key on a black instrument panel; keep it uppercase and short. Goes back to the app's own colours"), on: following) {
                 settings.notch.lightColor = nil
                 load(shown)
             }
-            .help("Follow the app's own colours")
-            .accessibilityValue(following ? "On" : "Off")
+            .help(String(localized: "Follow the app's own colours", bundle: .module, comment: "Tooltip of APP COLOUR"))
+            .accessibilityValue(following ? Self.on : Self.off)
         }
         .padding(.top, 12)
     }
@@ -393,16 +402,19 @@ public struct NotchLightPicker: View {
     static let hairline = Color(white: 0.11)
     static let hairlineStrong = Color(white: 0.18)
 
+    static var on: String { String(localized: "On", bundle: .module, comment: "Accessibility value: a switch-like key is on") }
+    static var off: String { String(localized: "Off", bundle: .module, comment: "Accessibility value: a switch-like key is off") }
+
     static func mono(_ size: CGFloat) -> Font { .system(size: size, design: .monospaced) }
 
     static var divider: some View { Rectangle().fill(hairline).frame(height: 1) }
 
     static func label(_ text: String) -> some View {
-        Text(text).font(mono(11)).tracking(3).foregroundStyle(dim).lineLimit(1)
+        Text(text).font(mono(11)).tracking(3).foregroundStyle(dim).lineLimit(1).minimumScaleFactor(0.7)
     }
 
     static func readout(_ step: Int) -> some View {
-        Text("\(Int((Double(step) / Double(steps) * 100).rounded()))")
+        Text(verbatim: "\(Int((Double(step) / Double(steps) * 100).rounded()))")
             .font(mono(12)).foregroundStyle(.white)
             .frame(width: 34, alignment: .trailing)
     }
@@ -458,7 +470,7 @@ struct NotchLightLEDs: View {
         }
         .frame(height: 16)
         .accessibilityElement()
-        .accessibilityValue("\(Int((Double(lit) / Double(count) * 100).rounded())) percent")
+        .accessibilityValue(String(localized: "\(Int((Double(lit) / Double(count) * 100).rounded())) percent", bundle: .module, comment: "Accessibility: how many LEDs are lit, in percent"))
         .accessibilityAdjustableAction { direction in
             set(max(0, min(count, lit + (direction == .increment ? 1 : -1))))
         }

@@ -32,7 +32,10 @@ public struct NotchDockStylePicker: View {
     var dock: NotchDock
     var caption: String
 
-    public static let defaultCaption = "Shared by every app on this Mac that docks in the notch. A change here applies to all of them."
+    /// The default caption, in the app's language.
+    public static var defaultCaption: String {
+        String(localized: "Shared by every app on this Mac that docks in the notch. A change here applies to all of them.", bundle: .module)
+    }
 
     public init(dock: NotchDock, caption: String = Self.defaultCaption) {
         self.dock = dock
@@ -50,7 +53,7 @@ public struct NotchDockStylePicker: View {
                 .tag(style)
             }
         } label: {
-            Text("Sharing style")
+            Text("Sharing style", bundle: .module, comment: "Settings picker title: how the docked apps share the notch")
             notchSettingsCaption(caption)
         }
         .pickerStyle(.radioGroup)
@@ -71,16 +74,16 @@ public struct NotchDockHoldRows: View {
         let untilAnswered = dock.urgentHold == .untilAnswered
         Picker(selection: Binding(get: { untilAnswered },
                                   set: { dock.setUrgentHold($0 ? .untilAnswered : .seconds(dock.urgentHoldSeconds)) })) {
-            Text("For a while").tag(false)
-            Text("Until answered").tag(true)
+            Text("For a while", bundle: .module, comment: "A question keeps the notch: for a number of seconds").tag(false)
+            Text("Until answered", bundle: .module, comment: "A question keeps the notch: until the user answers it").tag(true)
         } label: {
-            Text("A question keeps the notch")
-            notchSettingsCaption("While an app asks something, the others wait. After this the question stays in the app's own window.")
+            Text("A question keeps the notch", bundle: .module, comment: "Settings picker title: how long another app's question holds the notch")
+            notchSettingsCaption(String(localized: "While an app asks something, the others wait. After this the question stays in the app's own window.", bundle: .module))
         }
         if !untilAnswered {
             Stepper(value: Binding(get: { dock.urgentHoldSeconds }, set: { dock.setUrgentHold(.seconds($0)) }),
                     in: Self.secondsRange, step: 5) {
-                Text("For \(Int(dock.urgentHoldSeconds)) seconds")
+                Text("For \(Int(dock.urgentHoldSeconds)) seconds", bundle: .module, comment: "Stepper: how long a question keeps the notch")
             }
         }
     }
@@ -108,8 +111,8 @@ public struct NotchDockAppList: View {
         LabeledContent {
             EmptyView()
         } label: {
-            Text("Order")
-            notchSettingsCaption("Left to right in Split, top to bottom in Merged; first in line on a tie otherwise. Drag to reorder.")
+            Text("Order", bundle: .module, comment: "Settings row title: the order of the apps that share the notch")
+            notchSettingsCaption(String(localized: "Left to right in Split, top to bottom in Merged; first in line on a tie otherwise. Drag to reorder.", bundle: .module, comment: "Split and Merged are sharing style names"))
         }
         ForEach(Array(rows.enumerated()), id: \.element) { index, appID in
             let docked = dock.isDocked(appID)
@@ -118,26 +121,30 @@ public struct NotchDockAppList: View {
                 NotchAppIcon(bundleID: appID, size: 24)
                 VStack(alignment: .leading, spacing: 1) {
                     Text(NotchDockAppName.name(of: appID)).lineLimit(1)
-                    Text(appID == dock.me.appID ? "This app" : isBlocked ? "Blocked" : docked ? "Running" : "Not running")
+                    Text(appID == dock.me.appID ? String(localized: "This app", bundle: .module, comment: "Status of an app in a list: the app showing these settings")
+                         : isBlocked ? String(localized: "Blocked", bundle: .module, comment: "Status of an app in a list: the user keeps it out of the dock")
+                         : docked ? String(localized: "Running", bundle: .module, comment: "Status of an app in a list: it's open")
+                         : String(localized: "Not running", bundle: .module, comment: "Status of an app in a list: it isn't open"))
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 8)
                 Button { move(appID, by: -1, in: rows) } label: { Image(systemName: "chevron.up") }
                     .disabled(index == 0)
-                    .help("Move up")
+                    .help(String(localized: "Move up", bundle: .module, comment: "Tooltip: move this app up the list"))
                 Button { move(appID, by: 1, in: rows) } label: { Image(systemName: "chevron.down") }
                     .disabled(index == rows.count - 1)
-                    .help("Move down")
+                    .help(String(localized: "Move down", bundle: .module, comment: "Tooltip: move this app down the list"))
             }
             .buttonStyle(.borderless)
             .contextMenu {
                 if appID != dock.me.appID {
-                    Button(isBlocked ? "Allow in the Dock" : "Don't Dock with This App") {
+                    Button(isBlocked ? String(localized: "Allow in the Dock", bundle: .module, comment: "Menu item. The dock is the group of apps sharing the notch, not the macOS Dock")
+                           : String(localized: "Don't Dock with This App", bundle: .module, comment: "Menu item: keep this app out of the group of apps sharing the notch")) {
                         dock.setBlocked(appID, !isBlocked)
                     }
                 }
                 if !docked {
-                    Button("Remove from the List") { dock.setOrder(rows.filter { $0 != appID }) }
+                    Button(String(localized: "Remove from the List", bundle: .module, comment: "Menu item: remove this app from the list")) { dock.setOrder(rows.filter { $0 != appID }) }
                 }
             }
         }

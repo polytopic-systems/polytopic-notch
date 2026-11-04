@@ -1,0 +1,9 @@
+# Languages the package ships, besides English (the source). One per line; Tools/l10n/check.mjs requires each to be
+# fully translated. Add a language here, run Tools/l10n/translate.mjs, then Tools/l10n/check.mjs and swift test.
+de
+ja
+vi
+fr
+es
+it
+pl
