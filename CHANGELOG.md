@@ -3,6 +3,12 @@
 PolytopicNotch follows [semantic versioning](https://semver.org): a major release may break the API or the dock
 protocol; minor and patch releases don't. Apps on different dock protocol majors don't dock together.
 
+## 1.3.1
+
+- The localization tests run only where the build compiled the String Catalog. Xcode always does, and so does
+  SwiftPM in newer toolchains; an older `swift build` copies the catalog without compiling it, and the package then
+  shows English.
+
 ## 1.3.0
 
 Localized. Nothing changes in English, and no API changes.
